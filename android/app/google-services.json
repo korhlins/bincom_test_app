@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "525712867335",
+    "project_id": "bincom-test-f313e",
+    "storage_bucket": "bincom-test-f313e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:525712867335:android:7a960df64b054721ff2aa2",
+        "android_client_info": {
+          "package_name": "com.example.bincom_test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "525712867335-q4m6km9lhb7rbfthjv2pc5cit0uk1gga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhGFOncuD2R_hE-foDcQB6yVHST-pvMg4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "525712867335-q4m6km9lhb7rbfthjv2pc5cit0uk1gga.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
