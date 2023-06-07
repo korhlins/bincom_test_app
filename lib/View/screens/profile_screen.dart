@@ -19,7 +19,10 @@ class _AccountScreenState extends State<AccountScreen> {
           child: Column(
         children: [
           CircleAvatar(
-            backgroundImage: FileImage(File(user!.photoURL.toString())),
+            backgroundImage: FileImage(
+              File(user!.photoURL.toString()),
+              // radius:
+            ),
           )
         ],
       )),
