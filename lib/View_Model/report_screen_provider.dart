@@ -3,9 +3,22 @@ import 'package:flutter/cupertino.dart';
 
 class ReportScreenProvider extends ChangeNotifier {
   List<File> photos = [];
+  List<String> dropDownButtonList = [
+    'Riot',
+    'Accident',
+    'Protest',
+    'Stampede',
+    'Fighting'
+  ];
+  String? eventType;
 
-  List<File> get getPhoto {
-    return photos;
+  List<File> get getPhoto => photos;
+
+  List get getDropDownList => dropDownButtonList;
+
+  void setEventType(String value) {
+    eventType = value;
+    notifyListeners();
   }
 
   void addPhoto(final filePath) {
@@ -13,7 +26,12 @@ class ReportScreenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void resetPhoto() {
-    photos.clear();
+  void resetPhoto() => photos.clear();
+
+  void resetEventType() {
+    eventType = dropDownButtonList.first;
+    notifyListeners();
   }
+
+  String get getSetEvent => eventType!;
 }

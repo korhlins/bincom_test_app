@@ -19,16 +19,21 @@ class _AddReportFeedState extends State<AddReportFeed> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController eventTypeController = TextEditingController();
   TextEditingController locationController = TextEditingController();
+  String? imageUrl;
 
-  String? eventType = "";
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<ReportScreenProvider>().resetEventType();
+  }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
     locationController.dispose();
     descriptionController.dispose();
-    eventType = '';
+    super.dispose();
   }
 
   @override
@@ -53,67 +58,55 @@ class _AddReportFeedState extends State<AddReportFeed> {
                       controller: descriptionController,
                     ),
                     const SizedBox(height: 16.0),
-                    DropdownButtonFormField<String>(
-                      value: eventType,
-                      items: const [
-                        // DropdownMenuItem(
-                        //   value: 'riot',
-                        //   child: Text('Riot'),
-                        // ),
-                        // DropdownMenuItem(
-                        //   child: Text('Accident'),
-                        //   value: 'accident',
-                        // ),
-                        // DropdownMenuItem(
-                        //   child: Text('Fighting'),
-                        //   value: 'fighting',
-                        // ),
-                        // DropdownMenuItem(
-                        //   child: Text('Stampede'),
-                        //   value: 'stampede',
-                        // ),
-                        // DropdownMenuItem(
-                        //   child: Text('Protest'),
-                        //   value: 'protest',
-                        // ),
-                      ],
+                    DropdownButton<String>(
+                      value: context
+                              .read<ReportScreenProvider>()
+                              .getDropDownList
+                              .isNotEmpty
+                          ? context.watch<ReportScreenProvider>().getSetEvent
+                          : "",
+                      items: context
+                          .read<ReportScreenProvider>()
+                          .getDropDownList
+                          .map<DropdownMenuItem<String>>(
+                              (var listItem) => DropdownMenuItem<String>(
+                                    value: listItem,
+                                    child: Text(listItem),
+                                  ))
+                          .toList(),
                       onChanged: (value) {
-                        setState(() {
-                          eventType = value;
-                        });
+                        context
+                            .read<ReportScreenProvider>()
+                            .setEventType(value!);
                       },
-                      decoration: InputDecoration(labelText: 'Type of Event'),
                     ),
                     SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: () async {
-                        File? image = await Utils()
+                        XFile? image = await Utils()
                             .pickImage(ImageSource.gallery, context);
-                        if (image != null) {
+                        File imageFile = File(image.path);
+                        if (imageFile != null) {
                           // Upload image to Firebase Cloud Storage
-                          String imageUrl = await FirebaseMethods()
-                              .uploadImageToStorage(image: image);
-
-                          // Add the image URL to the photo list
-                          context
-                              .read<ReportScreenProvider>()
-                              .addPhoto(imageUrl);
+                          imageUrl = await FirebaseMethods()
+                              .uploadImageToStorage(image: imageFile);
                         }
                       },
-                      child: Text('Add Photos'),
+                      child: Text('Add Photos from gallery'),
                     ),
                     SizedBox(height: 16.0),
                     if (photoList.isNotEmpty)
-                      Column(
-                        children: context
-                            .read<ReportScreenProvider>()
-                            .getPhoto
+                      Wrap(
+                        children: photoList
                             .map(
-                              (photo) => Image.file(
-                                photo as File,
-                                width: 200.0,
-                                height: 200.0,
-                                fit: BoxFit.cover,
+                              (photoFile) => Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Image.file(
+                                  photoFile,
+                                  width: 150.0,
+                                  height: 150.0,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             )
                             .toList(),
@@ -128,13 +121,17 @@ class _AddReportFeedState extends State<AddReportFeed> {
                         onPressed: () async {
                           await FirebaseMethods().uploadData(
                               description: descriptionController.text,
-                              eventType: eventType,
-                              location: locationController.text);
+                              eventType: context
+                                  .read<ReportScreenProvider>()
+                                  .getSetEvent,
+                              location: locationController.text,
+                              imageUrl: imageUrl);
                           context.read<ReportScreenProvider>().resetPhoto();
+                          context.read<ReportScreenProvider>().resetEventType();
                           Navigator.pushNamed(context, HomeScreen.id);
                           // Clear form fields after successful upload
                         },
-                        child: Text("Report"))
+                        child: const Text("Report"))
                   ]),
             ),
           ),

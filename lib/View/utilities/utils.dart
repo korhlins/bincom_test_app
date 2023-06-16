@@ -29,12 +29,13 @@ class Utils {
       );
   }
 
-  pickImage(ImageSource source, BuildContext context) async {
+  Future<XFile> pickImage(ImageSource source, BuildContext context) async {
     final ImagePicker picker = ImagePicker();
     final XFile? image =
         await picker.pickImage(source: source, imageQuality: 20);
     if (image != null) {
       context.read<ReportScreenProvider>().addPhoto(image.path);
     }
+    return image!;
   }
 }

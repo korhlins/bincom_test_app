@@ -59,13 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }
             final reports = snapshot.data?.docs ?? [];
             if (reports.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text('No reports found.'),
               );
             }
@@ -73,50 +73,48 @@ class _HomeScreenState extends State<HomeScreen> {
             return ListView.builder(
               itemCount: reports.length,
               itemBuilder: (context, index) {
-                final report = reports[index].data();
+                final report = reports[index].data() as Map<String, dynamic>;
 
                 return Card(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                  child: Column(children: [
+                    ListTile(
+                      title: Text((report)['eventType'] ?? ''),
+                      subtitle: Text((report)['description'] ?? ''),
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                            (report)[user!.photoURL.toString()] ?? ''),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if ((report)['imageUrl'] != null &&
+                              (report)['imageUrl'].length >= 1)
+                            Image.network(
+                              (report)['imageUrl'][0] ?? '',
+                              width: 50.0,
+                              height: 50.0,
+                              fit: BoxFit.cover,
+                            ),
+                          SizedBox(width: 8.0),
+                          if ((report)['imageUrl'] != null &&
+                              (report)['imageUrl'].length >= 2)
+                            Image.network(
+                              (report)['imageUrl'][1] ?? '',
+                              width: 50.0,
+                              height: 50.0,
+                              fit: BoxFit.cover,
+                            ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ListTile(
-                          title: Text(
-                              (report as Map<String, dynamic>)['description'] ??
-                                  ''),
-                          subtitle: Text((report)['eventType'] ?? ''),
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                (report)[user!.photoURL.toString()] ?? ''),
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if ((report)[user!.photoURL.toString()] != null &&
-                                  (report)[user!.photoURL.toString()].length >=
-                                      1)
-                                Image.network(
-                                  (report)[user!.photoURL.toString()][0] ?? '',
-                                  width: 50.0,
-                                  height: 50.0,
-                                  fit: BoxFit.cover,
-                                ),
-                              SizedBox(width: 8.0),
-                              if ((report)[user!.photoURL.toString()] != null &&
-                                  (report)[user!.photoURL.toString()].length >=
-                                      2)
-                                Image.network(
-                                  (report)[user!.photoURL.toString()][1] ?? '',
-                                  width: 50.0,
-                                  height: 50.0,
-                                  fit: BoxFit.cover,
-                                ),
-                            ],
-                          ),
-                        ),
-                        Text("location: " +
-                                (report as Map<String, dynamic>)['location'] ??
-                            ''),
-                      ]),
+                        Text("User:  ${user!.displayName}"),
+                        Text("location: ${(report)['location'] ?? ''}"),
+                      ],
+                    ),
+                  ]),
                 );
               },
             );

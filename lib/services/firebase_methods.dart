@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bincom_test/View/utilities/utils.dart';
 import 'dart:io' show File;
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:bincom_test/View/screens/home_screen.dart';
 
 class FirebaseMethods {
   FirebaseMethods({this.context});
@@ -12,16 +11,14 @@ class FirebaseMethods {
   final navigatorKey = GlobalKey<NavigatorState>();
 
   final _auth = FirebaseAuth.instance;
+
   Future<String> uploadImageToStorage({String? childName, File? image}) async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    UploadTask uploadTask = storage
-        .ref()
-        .child(childName!)
-        .child(_auth.currentUser!.uid)
-        .putFile(image!);
-    TaskSnapshot snapshot = await uploadTask;
-    String downloadUrl = await snapshot.ref.getDownloadURL();
-    return downloadUrl;
+    final storageRef =
+        storage.ref().child('images/${image!.path.split('/').last}');
+    await storageRef.putFile(image);
+    String imageUrl = await storageRef.getDownloadURL();
+    return imageUrl;
   }
 
   Future<void> signInWithEmailAndPassword(
@@ -65,15 +62,23 @@ class FirebaseMethods {
   }
 
   Future<void> uploadData(
-      {String? description, String? eventType, String? location}) async {
+      {String? description,
+      String? eventType,
+      String? location,
+      String? imageUrl}) async {
     final CollectionReference dataCollection =
         FirebaseFirestore.instance.collection('data');
+    print(imageUrl);
     // Upload data to Firestore
-    await dataCollection.add({
-      'description': description,
-      'eventType': eventType,
-      'location': location,
-      // Additional fields or data you want to store
-    });
+    try {
+      await dataCollection.add({
+        'description': description,
+        'eventType': eventType,
+        'location': location,
+        'imageUrl': imageUrl,
+        // Additional fields or data you want to store
+      });
+    } on FirebaseException catch (e) {}
+    ;
   }
 }

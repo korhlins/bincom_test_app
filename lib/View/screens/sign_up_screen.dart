@@ -64,19 +64,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   backgroundImage: FileImage(image!),
                                   radius: width / 6,
                                 )
-                              :CircleAvatar(
-                            radius: width / 6,
-                          ),
+                              : CircleAvatar(
+                                  radius: width / 6,
+                                ),
                           Positioned.fill(
                             left: width / 4,
                             top: width / 4,
                             child: IconButton(
                               iconSize: width / 15,
                               onPressed: () async {
-                                String im = await Utils()
+                                XFile im = await Utils()
                                     .pickImage(ImageSource.gallery, context);
                                 setState(() {
-                                  image = File(im);
+                                  image = File(im.path);
                                 });
                               },
                               icon: const Icon(
@@ -204,8 +204,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           TextLink(
                               text: ' sign in',
                               onTap: () => {
-                                    Navigator.pushNamed(
-                                        context, LogInScreen.id)
+                                    Navigator.pushNamed(context, LogInScreen.id)
                                   },
                               decoration: TextDecoration.underline)
                         ],
