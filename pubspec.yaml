@@ -39,6 +39,7 @@ dependencies:
   firebase_storage: ^11.2.2
   image_picker: ^0.8.7+5
   google_fonts: ^4.0.4
+  pull_to_refresh_flutter3: ^2.0.1
 
 
 dev_dependencies:

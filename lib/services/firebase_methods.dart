@@ -6,17 +6,13 @@ import 'dart:io' show File;
 import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseMethods {
-  FirebaseMethods({this.context});
-  BuildContext? context;
   final navigatorKey = GlobalKey<NavigatorState>();
-
   final _auth = FirebaseAuth.instance;
 
   Future<String> uploadImageToStorage({String? childName, File? image}) async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    final storageRef =
-        storage.ref().child('images/${image!.path.split('/').last}');
-    await storageRef.putFile(image);
+    final storageRef = storage.ref().child(childName!);
+    await storageRef.putFile(image!);
     String imageUrl = await storageRef.getDownloadURL();
     return imageUrl;
   }
@@ -46,7 +42,7 @@ class FirebaseMethods {
       await user.updateDisplayName(userName);
       if (image != null) {
         String url =
-            await uploadImageToStorage(childName: 'profilepics', image: image);
+            await uploadImageToStorage(childName: 'profiles', image: image);
         await user.updatePhotoURL(url).whenComplete(() =>
             navigatorKey.currentState!.popUntil((route) => route.isFirst));
       }
@@ -68,7 +64,6 @@ class FirebaseMethods {
       String? imageUrl}) async {
     final CollectionReference dataCollection =
         FirebaseFirestore.instance.collection('data');
-    print(imageUrl);
     // Upload data to Firestore
     try {
       await dataCollection.add({

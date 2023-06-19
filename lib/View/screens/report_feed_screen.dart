@@ -54,6 +54,10 @@ class _AddReportFeedState extends State<AddReportFeed> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     TextField(
+                      textInputAction: TextInputAction.newline,
+                      keyboardType: TextInputType.multiline,
+                      minLines: 1,
+                      maxLines: 5,
                       decoration: InputDecoration(labelText: 'Description'),
                       controller: descriptionController,
                     ),
@@ -89,7 +93,10 @@ class _AddReportFeedState extends State<AddReportFeed> {
                         if (imageFile != null) {
                           // Upload image to Firebase Cloud Storage
                           imageUrl = await FirebaseMethods()
-                              .uploadImageToStorage(image: imageFile);
+                              .uploadImageToStorage(
+                                  childName:
+                                      'images/${image!.path.split('/')}.last',
+                                  image: imageFile);
                         }
                       },
                       child: Text('Add Photos from gallery'),
