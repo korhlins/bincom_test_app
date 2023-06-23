@@ -1,6 +1,6 @@
 import 'dart:io' show File;
 
-import 'package:bincom_test/View/components/text_field.dart';
+import 'package:bincom_test/View/utilities/enums.dart';
 import 'package:bincom_test/View/components/large_buttons.dart';
 import 'package:bincom_test/View/components/text_link.dart';
 import 'package:bincom_test/View/screens/home_screen.dart';
@@ -21,7 +21,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  File? image;
+  // List<File> profileImage = [];
   final _formKey = GlobalKey<FormState>();
   TextEditingController controller = TextEditingController();
   TextEditingController usernameController = TextEditingController();
@@ -56,24 +56,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       Stack(
                         children: [
-                          image != null
+                          context
+                                      .read<SignInAndOutProvider>()
+                                      .getProfilePhoto !=
+                                  null
                               ? CircleAvatar(
-                                  backgroundImage: FileImage(image!),
+                                  backgroundImage: FileImage(context
+                                      .read<SignInAndOutProvider>()
+                                      .getProfilePhoto!),
                                   radius: width / 6,
                                 )
                               : CircleAvatar(
                                   radius: width / 6,
                                 ),
                           Positioned.fill(
-                            left: width / 4,
-                            top: width / 4,
+                            left: width / 4.3,
+                            top: width / 4.3,
                             child: IconButton(
                               iconSize: width / 15,
                               onPressed: () async {
-                                await Utils().pickImage(context);
-                                // setState(() {
-                                //   image = File(im.path);
-                                // });
+                                await Utils().pickImage(
+                                    context, ImageType.profilePics.toString());
                               },
                               icon: const Icon(
                                 Icons.add_a_photo,
@@ -83,9 +86,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ],
                       ),
-                      TextFields(
-                        hintText: 'Username',
-                        passwordVisible: false,
+                      SizedBox(
+                        height: height * 0.03,
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: "Username",
+                          hintStyle: const TextStyle(
+                            color: Colors.black26,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFF2F6FF)),
+                            borderRadius: BorderRadius.circular(height * 0.02),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Color(0xFFF2F6FF),
+                            ),
+                            borderRadius: BorderRadius.circular(height * 0.02),
+                          ),
+                        ),
                         controller: usernameController,
                       ),
                       SizedBox(
@@ -173,18 +194,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         inputText: 'Create account',
                         onPress: () async {
                           FocusScope.of(context).focusedChild?.unfocus();
-                          context
-                              .read<SignInAndOutProvider>()
-                              .setSpinnerAction(true);
+                          // context
+                          //     .read<SignInAndOutProvider>()
+                          //     .setSpinnerAction(true);
+
                           FirebaseMethods().signUpWithAndPassword(
+                            image: context
+                                .read<SignInAndOutProvider>()
+                                .getProfilePhoto,
                             email: emailController.text,
                             password: passwordController.text,
                             userName: usernameController.text,
                           );
+
                           context
                               .read<SignInAndOutProvider>()
                               .setSpinnerAction(false);
-                          Navigator.pushNamed(context, HomeScreen.id);
+                          // Navigator.pushNamed(context, HomeScreen.id);
                         },
                       ),
                       SizedBox(

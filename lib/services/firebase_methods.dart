@@ -1,3 +1,4 @@
+import 'package:bincom_test/Model/upload_situation_data_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 class FirebaseMethods {
   final navigatorKey = GlobalKey<NavigatorState>();
   final _auth = FirebaseAuth.instance;
+  final _storage = FirebaseFirestore.instance;
 
   Future<String> uploadImageToStorage({String? childName, File? image}) async {
     FirebaseStorage storage = FirebaseStorage.instance;
@@ -43,40 +45,33 @@ class FirebaseMethods {
       if (image != null) {
         String url =
             await uploadImageToStorage(childName: 'profiles', image: image);
-        await user.updatePhotoURL(url).whenComplete(() =>
-            navigatorKey.currentState!.popUntil((route) => route.isFirst));
+        await user.updatePhotoURL(url);
+        // .whenComplete(() =>
+        // navigatorKey.currentState!.popUntil((route) => route.isFirst))
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == "weak-password") {
         Utils.snackBar("The password provided is too weak.");
       } else if (e.code == "email-already-in-use") {
         Utils.snackBar("The account already exit for that email.");
+      } else if (e.code == "invalid-email") {
+        Utils.snackBar("Invalid email");
       }
     } catch (e) {
       Utils.snackBar(e.toString());
     }
   }
 
-  Future<void> uploadData(
-      {String? description,
-      String? eventType,
-      String? location,
-      List<String>? imageUrl}) async {
-    final CollectionReference dataCollection =
-        FirebaseFirestore.instance.collection('data');
+  Future<void> uploadData(SituationData situationData) async {
+    final CollectionReference dataCollection = _storage.collection('data');
     // Upload data to Firestore
     try {
       await dataCollection.add({
-        'description': description,
-        'eventType': eventType,
-        'location': location,
-        'imageUrl': imageUrl,
-        'timestamp': FieldValue.serverTimestamp(),
+        situationData.toMap()
         // Additional fields or data you want to store
       });
     } on FirebaseException catch (e) {
       print(e);
     }
-    ;
   }
 }

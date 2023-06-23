@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:bincom_test/services/firebase_methods.dart';
+import 'package:bincom_test/Model/upload_situation_data_model.dart';
 
 class AddReportFeed extends StatefulWidget {
   static const String id = "AddReportFeed";
@@ -89,7 +90,7 @@ class _AddReportFeedState extends State<AddReportFeed> {
                     SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: () async {
-                        await Utils().pickImage(context);
+                        await Utils().pickImage(context, '');
                         images = context.read<ReportScreenProvider>().getPhoto;
                       },
                       child: Text('Add Photos from gallery'),
@@ -129,13 +130,13 @@ class _AddReportFeedState extends State<AddReportFeed> {
                                           'images/${imageFile.path.split('/')}.last',
                                       image: imageFile));
                             }
-                            await FirebaseMethods().uploadData(
+                            await FirebaseMethods().uploadData(SituationData(
                                 description: descriptionController.text,
                                 eventType: context
                                     .read<ReportScreenProvider>()
                                     .getSetEvent,
                                 location: locationController.text,
-                                imageUrl: imageUrl);
+                                imageUrl: imageUrl));
                             // context.read<ReportScreenProvider>().resetPhoto();
                             // context.read<ReportScreenProvider>().resetEventType();
                             Navigator.pushNamed(context, HomeScreen.id);

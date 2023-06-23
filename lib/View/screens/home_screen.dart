@@ -16,14 +16,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final user = FirebaseAuth.instance.currentUser;
+  final user = FirebaseAuth.instance;
   List<String> imageUrl = [];
   RefreshController refreshController =
       RefreshController(initialRefresh: false);
 
   @override
   Widget build(BuildContext context) {
-    double height = ScreenDimension(context: context).getHeight();
     double width = ScreenDimension(context: context).getWidth();
 
     return Scaffold(
@@ -94,16 +93,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CircleAvatar(
-                                // backgroundImage: NetworkImage(
-                                //     (report)[user!.photoURL.toString()] ?? ''),
-                                ),
+                              backgroundImage:
+                                  NetworkImage(user.currentUser!.photoURL!),
+                            ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${user!.displayName}',
+                                    '${user.currentUser!.displayName}',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),

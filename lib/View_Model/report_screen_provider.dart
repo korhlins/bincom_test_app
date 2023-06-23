@@ -12,10 +12,6 @@ class ReportScreenProvider extends ChangeNotifier {
   ];
   String? eventType;
 
-  List<File> get getPhoto => photos;
-
-  List get getDropDownList => dropDownButtonList;
-
   void setEventType(String value) {
     eventType = value;
     notifyListeners();
@@ -34,4 +30,8 @@ class ReportScreenProvider extends ChangeNotifier {
   }
 
   String get getSetEvent => eventType!;
+
+  List<File> get getPhoto => photos;
+
+  List get getDropDownList => dropDownButtonList;
 }
