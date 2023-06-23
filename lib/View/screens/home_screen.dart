@@ -17,6 +17,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final user = FirebaseAuth.instance.currentUser;
+  List<String> imageUrl = [];
+  RefreshController refreshController =
+      RefreshController(initialRefresh: false);
 
   @override
   Widget build(BuildContext context) {
@@ -54,96 +57,92 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text("Citizens Reporting Solution"),
       ),
       body: SafeArea(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('data').snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
-              );
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            final reports = snapshot.data?.docs ?? [];
-            if (reports.isEmpty) {
-              return const Center(
-                child: Text('No reports found.'),
-              );
-            }
+        child: SmartRefresher(
+          controller: refreshController,
+          enablePullDown: true,
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('data').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              final reports = snapshot.data?.docs ?? [];
+              if (reports.isEmpty) {
+                return const Center(
+                  child: Text('No reports found.'),
+                );
+              }
 
-            return ListView.builder(
-              itemCount: reports.length,
-              itemBuilder: (context, index) {
-                final report = reports[index].data() as Map<String, dynamic>;
+              return ListView.builder(
+                itemCount: reports.length,
+                itemBuilder: (context, index) {
+                  final report = reports[index].data() as Map<String, dynamic>;
 
-                return Padding(
-                  padding: EdgeInsets.only(
-                      left: width / 35, right: width / 35, top: width / 50),
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                              // backgroundImage: NetworkImage(
-                              //     (report)[user!.photoURL.toString()] ?? ''),
-                              ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${user!.displayName}',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  (report)['description'] ?? '',
-                                ),
-                                Wrap(children: [
-                                  if ((report)['imageUrl'] != null &&
-                                      (report)['imageUrl'].length >= 1)
-                                    Image.network(
-                                      (report)['imageUrl'] ?? '',
-                                      width: width / 40,
-                                      height: width / 40,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  SizedBox(width: 8.0),
-                                  // if ((report)['imageUrl'] != null &&
-                                  //     (report)['imageUrl'].length >= 2)
-                                  //   Image.network(
-                                  //     (report)['imageUrl'][1] ?? '',
-                                  //     width: width / 40,
-                                  //     height: width / 40,
-                                  //     fit: BoxFit.cover,
-                                  //   ),
-                                ]),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: width / 25),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  return Padding(
+                    padding: EdgeInsets.only(
+                        left: width / 35, right: width / 35, top: width / 50),
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("EventType: ${(report)['eventType']}" ?? ''),
-                            Text("location: ${(report)['location'] ?? ''}"),
+                            CircleAvatar(
+                                // backgroundImage: NetworkImage(
+                                //     (report)[user!.photoURL.toString()] ?? ''),
+                                ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${user!.displayName}',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    (report)['description'] ?? '',
+                                  ),
+                                  Wrap(
+                                      children: ((report)['imageUrl']
+                                              as List<dynamic>)
+                                          .map((imageUrl) => Image.network(
+                                                imageUrl,
+                                                width: width / 5,
+                                                height: width / 5,
+                                                fit: BoxFit.cover,
+                                              ))
+                                          .toList())
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                      Divider(thickness: width / 230)
-                    ],
-                  ),
-                );
-              },
-            );
-          },
+                        Padding(
+                          padding: EdgeInsets.only(top: width / 25),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("EventType: ${(report)['eventType']}" ?? ''),
+                              Text("location: ${(report)['location'] ?? ''}"),
+                            ],
+                          ),
+                        ),
+                        Divider(thickness: width / 230)
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );

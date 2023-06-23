@@ -1,3 +1,5 @@
+import 'dart:io' show File;
+
 import 'package:bincom_test/View/utilities/color_style.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,13 +31,13 @@ class Utils {
       );
   }
 
-  Future<XFile> pickImage(ImageSource source, BuildContext context) async {
+  Future<void> pickImage(BuildContext context) async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image =
-        await picker.pickImage(source: source, imageQuality: 20);
-    if (image != null) {
-      context.read<ReportScreenProvider>().addPhoto(image.path);
+    final List<XFile> images = await picker.pickMultiImage(imageQuality: 20);
+    if (images != null) {
+      for (var image in images) {
+        context.read<ReportScreenProvider>().addPhoto(image.path);
+      }
     }
-    return image!;
   }
 }

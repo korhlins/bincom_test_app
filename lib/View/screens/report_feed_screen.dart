@@ -19,13 +19,15 @@ class _AddReportFeedState extends State<AddReportFeed> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController eventTypeController = TextEditingController();
   TextEditingController locationController = TextEditingController();
-  String? imageUrl;
+  List<String> imageUrl = [];
+  late List<File> images = [];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     context.read<ReportScreenProvider>().resetEventType();
+    context.read<ReportScreenProvider>().resetPhoto();
   }
 
   @override
@@ -87,17 +89,8 @@ class _AddReportFeedState extends State<AddReportFeed> {
                     SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: () async {
-                        XFile? image = await Utils()
-                            .pickImage(ImageSource.gallery, context);
-                        File imageFile = File(image.path);
-                        if (imageFile != null) {
-                          // Upload image to Firebase Cloud Storage
-                          imageUrl = await FirebaseMethods()
-                              .uploadImageToStorage(
-                                  childName:
-                                      'images/${image!.path.split('/')}.last',
-                                  image: imageFile);
-                        }
+                        await Utils().pickImage(context);
+                        images = context.read<ReportScreenProvider>().getPhoto;
                       },
                       child: Text('Add Photos from gallery'),
                     ),
@@ -126,17 +119,28 @@ class _AddReportFeedState extends State<AddReportFeed> {
                     SizedBox(height: 16.0),
                     ElevatedButton(
                         onPressed: () async {
-                          await FirebaseMethods().uploadData(
-                              description: descriptionController.text,
-                              eventType: context
-                                  .read<ReportScreenProvider>()
-                                  .getSetEvent,
-                              location: locationController.text,
-                              imageUrl: imageUrl);
-                          context.read<ReportScreenProvider>().resetPhoto();
-                          context.read<ReportScreenProvider>().resetEventType();
-                          Navigator.pushNamed(context, HomeScreen.id);
-                          // Clear form fields after successful upload
+                          WidgetsBinding.instance
+                              .addPostFrameCallback((_) async {
+                            for (var imageFile in images) {
+                              // Upload image to Firebase Cloud Storage
+                              imageUrl.add(await FirebaseMethods()
+                                  .uploadImageToStorage(
+                                      childName:
+                                          'images/${imageFile.path.split('/')}.last',
+                                      image: imageFile));
+                            }
+                            await FirebaseMethods().uploadData(
+                                description: descriptionController.text,
+                                eventType: context
+                                    .read<ReportScreenProvider>()
+                                    .getSetEvent,
+                                location: locationController.text,
+                                imageUrl: imageUrl);
+                            // context.read<ReportScreenProvider>().resetPhoto();
+                            // context.read<ReportScreenProvider>().resetEventType();
+                            Navigator.pushNamed(context, HomeScreen.id);
+                            // Clear form fields after successful upload
+                          });
                         },
                         child: const Text("Report"))
                   ]),

@@ -61,7 +61,7 @@ class FirebaseMethods {
       {String? description,
       String? eventType,
       String? location,
-      String? imageUrl}) async {
+      List<String>? imageUrl}) async {
     final CollectionReference dataCollection =
         FirebaseFirestore.instance.collection('data');
     // Upload data to Firestore
@@ -71,9 +71,12 @@ class FirebaseMethods {
         'eventType': eventType,
         'location': location,
         'imageUrl': imageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
         // Additional fields or data you want to store
       });
-    } on FirebaseException catch (e) {}
+    } on FirebaseException catch (e) {
+      print(e);
+    }
     ;
   }
 }

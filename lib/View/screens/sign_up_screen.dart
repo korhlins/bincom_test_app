@@ -7,10 +7,7 @@ import 'package:bincom_test/View/screens/home_screen.dart';
 import 'package:bincom_test/View/screens/sign_in_screen.dart';
 import 'package:bincom_test/View/utilities/utils.dart';
 import 'package:bincom_test/services/firebase_methods.dart';
-import 'package:bincom_test/View/utilities/color_style.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../View_Model/signIn_provider.dart';
 import '../utilities/media_query.dart';
@@ -73,11 +70,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             child: IconButton(
                               iconSize: width / 15,
                               onPressed: () async {
-                                XFile im = await Utils()
-                                    .pickImage(ImageSource.gallery, context);
-                                setState(() {
-                                  image = File(im.path);
-                                });
+                                await Utils().pickImage(context);
+                                // setState(() {
+                                //   image = File(im.path);
+                                // });
                               },
                               icon: const Icon(
                                 Icons.add_a_photo,
