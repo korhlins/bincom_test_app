@@ -1,6 +1,5 @@
 import 'package:bincom_test/View/components/large_buttons.dart';
 import 'package:bincom_test/View/components/text_link.dart';
-import 'package:bincom_test/View/screens/home_screen.dart';
 import 'package:bincom_test/View/screens/sign_up_screen.dart';
 import 'package:bincom_test/services/firebase_methods.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +21,14 @@ class _LogInScreenState extends State<LogInScreen> {
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,16 +157,14 @@ class _LogInScreenState extends State<LogInScreen> {
                           inputText: 'Sign in',
                           onPress: () async {
                             FocusScope.of(context).focusedChild?.unfocus();
-                            context
-                                .read<SignInAndOutProvider>()
-                                .setSpinnerAction(true);
+                            const CircularProgressIndicator();
                             FirebaseMethods().signInWithEmailAndPassword(
                                 email: emailController.text,
-                                password: passwordController.text);
+                                password: passwordController.text,
+                                context: context);
                             context
                                 .read<SignInAndOutProvider>()
                                 .setSpinnerAction(false);
-                            Navigator.pushNamed(context, HomeScreen.id);
                           }),
                       SizedBox(
                         height: height * 0.01,

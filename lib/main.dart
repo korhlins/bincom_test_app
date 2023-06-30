@@ -5,6 +5,7 @@ import 'package:bincom_test/View/screens/profile_screen.dart';
 import 'package:bincom_test/View_Model/bottom_nav_bar_provider.dart';
 import 'package:bincom_test/View_Model/report_screen_provider.dart';
 import 'package:bincom_test/View_Model/signIn_provider.dart';
+import 'package:bincom_test/View/utilities/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -32,6 +33,7 @@ class IncidentReportApp extends StatelessWidget {
               create: (BuildContext context) => ReportScreenProvider()),
         ],
         child: MaterialApp(
+          scaffoldMessengerKey: messengerKey,
           initialRoute: user != null ? HomeScreen.id : LogInScreen.id,
           routes: {
             HomeScreen.id: (context) => HomeScreen(),

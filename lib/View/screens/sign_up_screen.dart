@@ -194,18 +194,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         inputText: 'Create account',
                         onPress: () async {
                           FocusScope.of(context).focusedChild?.unfocus();
-                          // context
-                          //     .read<SignInAndOutProvider>()
-                          //     .setSpinnerAction(true);
-
+                          CircularProgressIndicator();
                           FirebaseMethods().signUpWithAndPassword(
-                            image: context
-                                .read<SignInAndOutProvider>()
-                                .getProfilePhoto,
-                            email: emailController.text,
-                            password: passwordController.text,
-                            userName: usernameController.text,
-                          );
+                              image: context
+                                  .read<SignInAndOutProvider>()
+                                  .getProfilePhoto,
+                              email: emailController.text,
+                              password: passwordController.text,
+                              userName: usernameController.text,
+                              context: context);
 
                           context
                               .read<SignInAndOutProvider>()
