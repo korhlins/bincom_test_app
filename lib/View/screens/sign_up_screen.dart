@@ -195,7 +195,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         onPress: () async {
                           FocusScope.of(context).focusedChild?.unfocus();
                           CircularProgressIndicator();
-                          FirebaseMethods().signUpWithAndPassword(
+                          FirebaseApis().signUpWithAndPassword(
                               image: context
                                   .read<SignInAndOutProvider>()
                                   .getProfilePhoto,

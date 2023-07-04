@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:bincom_test/Model/upload_situation_data_model.dart';
+import 'package:bincom_test/services/firebase_methods.dart';
 import 'package:flutter/cupertino.dart';
 
 class ReportScreenProvider extends ChangeNotifier {
@@ -27,6 +29,10 @@ class ReportScreenProvider extends ChangeNotifier {
   void resetEventType() {
     eventType = dropDownButtonList.first;
     notifyListeners();
+  }
+
+  void uploadData(SituationData situationData) async {
+    await FirebaseApis().uploadData(situationData);
   }
 
   String get getSetEvent => eventType!;

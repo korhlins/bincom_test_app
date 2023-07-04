@@ -124,23 +124,21 @@ class _AddReportFeedState extends State<AddReportFeed> {
                               .addPostFrameCallback((_) async {
                             for (var imageFile in images) {
                               // Upload image to Firebase Cloud Storage
-                              imageUrl.add(await FirebaseMethods()
+                              imageUrl.add(await FirebaseApis()
                                   .uploadImageToStorage(
                                       childName:
                                           'images/${imageFile.path.split('/')}.last',
                                       image: imageFile));
                             }
-                            await FirebaseMethods().uploadData(SituationData(
-                                description: descriptionController.text,
-                                eventType: context
-                                    .read<ReportScreenProvider>()
-                                    .getSetEvent,
-                                location: locationController.text,
-                                imageUrl: imageUrl));
-                            // context.read<ReportScreenProvider>().resetPhoto();
-                            // context.read<ReportScreenProvider>().resetEventType();
+                            context.read<ReportScreenProvider>().uploadData(
+                                SituationData(
+                                    description: descriptionController.text,
+                                    eventType: context
+                                        .read<ReportScreenProvider>()
+                                        .getSetEvent,
+                                    location: locationController.text,
+                                    imageUrl: imageUrl));
                             Navigator.pushNamed(context, HomeScreen.id);
-                            // Clear form fields after successful upload
                           });
                         },
                         child: const Text("Report"))

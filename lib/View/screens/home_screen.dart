@@ -1,8 +1,10 @@
 import 'package:bincom_test/View/utilities/media_query.dart';
+import 'package:bincom_test/View_Model/report_feed_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bincom_test/View_Model/bottom_nav_bar_provider.dart';
+import 'package:bincom_test/View_Model/report_feed_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:bincom_test/View/screens/profile_screen.dart';
 import 'package:bincom_test/View/screens/report_feed_screen.dart';
@@ -60,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
           controller: refreshController,
           enablePullDown: true,
           child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('data').snapshots(),
+            stream: context.read<ReportFeedProvider>().getReportStream(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Center(

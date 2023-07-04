@@ -158,7 +158,7 @@ class _LogInScreenState extends State<LogInScreen> {
                           onPress: () async {
                             FocusScope.of(context).focusedChild?.unfocus();
                             const CircularProgressIndicator();
-                            FirebaseMethods().signInWithEmailAndPassword(
+                            FirebaseApis().signInWithEmailAndPassword(
                                 email: emailController.text,
                                 password: passwordController.text,
                                 context: context);
