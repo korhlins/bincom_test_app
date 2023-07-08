@@ -32,7 +32,8 @@ class ReportScreenProvider extends ChangeNotifier {
   }
 
   void uploadData(SituationData situationData) async {
-    await FirebaseApis().uploadData(situationData);
+    await FirebaseApis().uploadData(
+        addData: situationData.toMap(), data: "data", docsName: "report");
   }
 
   String get getSetEvent => eventType!;
