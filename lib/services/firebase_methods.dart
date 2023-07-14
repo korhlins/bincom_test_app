@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:bincom_test/View/screens/home_screen.dart';
 import 'package:bincom_test/View/screens/sign_in_screen.dart';
@@ -8,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bincom_test/View/utilities/utils.dart';
 import 'dart:io' show File;
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:http/http.dart' as http;
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print("Title: ${message.notification!.title}");
@@ -89,8 +93,9 @@ class FirebaseApis {
       required String data,
       required String docsName}) async {
     docNumber();
-    final DocumentReference dataCollection =
-        _storage.collection(data).doc("$docsName-$docNum");
+    final DocumentReference dataCollection = _storage
+        .collection(data)
+        .doc("$docsName-${userCredential?.user?.displayName}");
     // Upload data to Firestore
     try {
       await dataCollection.set(addData
@@ -103,7 +108,7 @@ class FirebaseApis {
 
   initInfo() {
     var androidInitiatize =
-        const AndroidInitializationSettings("ic_launcher.png");
+        const AndroidInitializationSettings("@mipmap/ic_launcher");
     var iOSInitiatize = const DarwinInitializationSettings();
     var initializationSetting =
         InitializationSettings(android: androidInitiatize, iOS: iOSInitiatize);
@@ -130,10 +135,16 @@ class FirebaseApis {
       NotificationDetails plaformChannelSpecifics = NotificationDetails(
           android: androidNotificationDetails,
           iOS: const DarwinNotificationDetails());
-
-      await flutterLocalNotificationsPlugin.show(0, message.notification!.title,
-          message.notification!.body, plaformChannelSpecifics,
-          payload: message.data['body']);
+      try {
+        await flutterLocalNotificationsPlugin.show(
+            0,
+            message.notification!.title,
+            message.notification!.body,
+            plaformChannelSpecifics,
+            payload: message.data['body']);
+      } catch (e) {
+        print(e);
+      }
     });
   }
 
@@ -144,5 +155,35 @@ class FirebaseApis {
         addData: {"Token": fCMToken}, data: 'UserTokens', docsName: 'Users');
     initInfo();
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  }
+
+  void sendPushMessage(String token, String body, String title) async {
+    try {
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            "Content-Type": "Application/json",
+            "Authorization":
+                "key=BMiCATdeSXjSZ6Usc2OUcoJrsrw0ZHnz3A3Wd1RAW48wkUZRC3sQlc-qI5IEJN4W1uzY3H3RJ0fmPWr_cX5ccAw"
+          },
+          body: jsonEncode(<String, dynamic>{
+            "priority": "high",
+            "data": <String, dynamic>{
+              "click_action": "FLUTTER_NOTIFICATION_CLICK",
+              "status": "done",
+              "body": body,
+              "title": title,
+            },
+            "notification": <String, dynamic>{
+              "title": title,
+              "body": body,
+              "android_channel_id": "ReportInfo"
+            },
+            "to": token,
+          }));
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 }
