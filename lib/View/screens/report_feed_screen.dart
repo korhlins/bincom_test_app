@@ -3,6 +3,7 @@ import 'dart:io' show File;
 import 'package:bincom_test/View/screens/home_screen.dart';
 import 'package:bincom_test/View/utilities/utils.dart';
 import 'package:bincom_test/View_Model/report_screen_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -41,7 +42,7 @@ class _AddReportFeedState extends State<AddReportFeed> {
 
   @override
   Widget build(BuildContext context) {
-    final photoList = context.read<ReportScreenProvider>().getPhoto;
+    // final photoList = context.read<ReportScreenProvider>().getPhoto;
     return Scaffold(
         appBar: AppBar(
           title: Text('Upload Data'),
@@ -93,12 +94,12 @@ class _AddReportFeedState extends State<AddReportFeed> {
                         await Utils().pickImage(context, '');
                         images = context.read<ReportScreenProvider>().getPhoto;
                       },
-                      child: Text('Add Photos from gallery'),
+                      child: const Text('Add Photos from gallery'),
                     ),
-                    SizedBox(height: 16.0),
-                    if (photoList.isNotEmpty)
+                    const SizedBox(height: 16.0),
+                    if (images.isNotEmpty)
                       Wrap(
-                        children: photoList
+                        children: images
                             .map(
                               (photoFile) => Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -112,22 +113,21 @@ class _AddReportFeedState extends State<AddReportFeed> {
                             )
                             .toList(),
                       ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     TextField(
-                      decoration: InputDecoration(labelText: 'Location'),
+                      decoration: const InputDecoration(labelText: 'Location'),
                       controller: locationController,
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     ElevatedButton(
                         onPressed: () async {
-                          WidgetsBinding.instance
-                              .addPostFrameCallback((_) async {
+                          Future.microtask(() async {
                             for (var imageFile in images) {
                               // Upload image to Firebase Cloud Storage
                               imageUrl.add(await FirebaseApis()
                                   .uploadImageToStorage(
                                       childName:
-                                          'images/${imageFile.path.split('/')}.last',
+                                          'images/${imageFile.path.split('/').last}',
                                       image: imageFile));
                             }
                             context.read<ReportScreenProvider>().uploadData(
@@ -139,6 +139,14 @@ class _AddReportFeedState extends State<AddReportFeed> {
                                     location: locationController.text,
                                     imageUrl: imageUrl));
                             Navigator.pushNamed(context, HomeScreen.id);
+                            DocumentSnapshot snap = await FirebaseFirestore
+                                .instance
+                                .collection("UserTokens")
+                                .doc("Users-1")
+                                .get();
+                            String token = snap['Token'];
+                            FirebaseApis().sendPushMessage(
+                                token, descriptionController.text, "Report");
                           });
                         },
                         child: const Text("Report"))

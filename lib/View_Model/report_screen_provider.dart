@@ -13,6 +13,10 @@ class ReportScreenProvider extends ChangeNotifier {
     'Fighting'
   ];
   String? eventType;
+  int docNum = 0;
+  void docNumber() {
+    docNum++;
+  }
 
   void setEventType(String value) {
     eventType = value;
@@ -32,7 +36,8 @@ class ReportScreenProvider extends ChangeNotifier {
   }
 
   void uploadData(SituationData situationData) async {
-    await FirebaseApis().uploadData(
+    docNumber();
+    await FirebaseApis().uploadData(docNum,
         addData: situationData.toMap(), data: "data", docsName: "report");
   }
 

@@ -27,10 +27,6 @@ class FirebaseApis {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   UserCredential? userCredential;
-  int docNum = 0;
-  void docNumber() {
-    docNum += 1;
-  }
 
   Future<String> uploadImageToStorage({String? childName, File? image}) async {
     FirebaseStorage storage = FirebaseStorage.instance;
@@ -89,18 +85,18 @@ class FirebaseApis {
   }
 
   Future<void> uploadData(
-      {required Map<String, dynamic> addData,
-      required String data,
-      required String docsName}) async {
-    docNumber();
-    final DocumentReference dataCollection = _storage
-        .collection(data)
-        .doc("$docsName-${userCredential?.user?.displayName}");
+    int docNum, {
+    required Map<String, dynamic> addData,
+    required String data,
+    required String docsName,
+  }) async {
+    final DocumentReference dataCollection =
+        _storage.collection(data).doc("$docsName-$docNum");
+
     // Upload data to Firestore
     try {
-      await dataCollection.set(addData
-          // Additional fields or data you want to store
-          );
+      // Additional fields or data you want to store
+      await dataCollection.set(addData);
     } on FirebaseException catch (e) {
       Utils.snackBar(e.message);
     }
@@ -152,7 +148,11 @@ class FirebaseApis {
     await firebaseMessaging.requestPermission();
     final fCMToken = await firebaseMessaging.getToken();
     uploadData(
-        addData: {"Token": fCMToken}, data: 'UserTokens', docsName: 'Users');
+      0,
+      addData: {"Token": fCMToken},
+      data: 'UserTokens',
+      docsName: 'Users',
+    );
     initInfo();
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
   }

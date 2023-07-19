@@ -36,7 +36,7 @@ class Utils {
   Future<void> pickImage(BuildContext context, String imageType) async {
     final ImagePicker picker = ImagePicker();
 
-    if (imageType == ImageType.profilePics.toString()) {
+    if (imageType == ImageType.profilePics.name) {
       final XFile? image =
           await picker.pickImage(source: ImageSource.gallery, imageQuality: 20);
       context.read<SignInAndOutProvider>().addProfilePhoto(image!.path);
